@@ -11,16 +11,15 @@ public class Carta {
 
     private int indice;
 
-    // metodo constructor
+    // Constructor
     public Carta(Random r) {
-        // generar un numero al azar entre 1 y 52
+        // Generar un número entre 1 y 52
         indice = r.nextInt(52) + 1;
     }
 
     public void mostrar(JPanel pnl, int x, int y) {
         String nombreArchivo = "resources/imagenes/CARTA" + indice + ".jpg";
         ImageIcon imgCarta = new ImageIcon(nombreArchivo);
-
 
         JLabel lblCarta = new JLabel();
         lblCarta.setIcon(imgCarta);
@@ -55,4 +54,17 @@ public class Carta {
         return NombreCarta.values()[residuo - 1];
     }
 
+    // ✅ Nuevo método: Devuelve el valor numérico de la carta
+    public int getValor() {
+        NombreCarta nombre = getNombre();
+        switch (nombre) {
+            case JACK:
+            case QUEEN:
+            case KING:
+            case AS:
+                return 10;
+            default:
+                return nombre.ordinal() + 1;
+        }
+    }
 }
