@@ -31,7 +31,6 @@ public class Jugador {
         boolean hayGrupos = false;
         List<Carta> cartasContadas = new ArrayList<>();
 
-        // --- Detectar pares, ternas, etc ---
         int[] contadores = new int[NombreCarta.values().length];
         ArrayList<Carta>[] cartasPorNombre = new ArrayList[NombreCarta.values().length];
         for (int i = 0; i < cartasPorNombre.length; i++) {
@@ -65,7 +64,7 @@ public class Jugador {
         }
 
         for (Carta c : cartas) {
-            int indice = c.getPinta().ordinal(); // ordinal = 0, 1, 2, 3
+            int indice = c.getPinta().ordinal(); 
             cartasPorPinta[indice].add(c);
         }
 
