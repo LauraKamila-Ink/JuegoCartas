@@ -8,7 +8,7 @@ public class Jugador {
     private int DISTANCIA = 40;
 
     private Carta[] cartas = new Carta[TOTAL_CARTAS];
-    private Random r = new Random(); // la suerte del jugador
+    private Random r = new Random();
 
     public void repartir() {
         for (int i = 0; i < TOTAL_CARTAS; i++) {
@@ -31,16 +31,17 @@ public class Jugador {
         boolean hayGrupos = false;
         List<Carta> cartasContadas = new ArrayList<>();
 
-        // Contador por nombre para detectar pares, ternas, etc.
+        // --- Detectar pares, ternas, etc ---
         int[] contadores = new int[NombreCarta.values().length];
-        Map<NombreCarta, List<Carta>> mapaCartasPorNombre = new HashMap<>();
+        ArrayList<Carta>[] cartasPorNombre = new ArrayList[NombreCarta.values().length];
+        for (int i = 0; i < cartasPorNombre.length; i++) {
+            cartasPorNombre[i] = new ArrayList<>();
+        }
 
         for (Carta c : cartas) {
-            NombreCarta nombre = c.getNombre();
-            contadores[nombre.ordinal()]++;
-            mapaCartasPorNombre
-                .computeIfAbsent(nombre, k -> new ArrayList<>())
-                .add(c);
+            int i = c.getNombre().ordinal();
+            contadores[i]++;
+            cartasPorNombre[i].add(c);
         }
 
         for (int i = 0; i < contadores.length; i++) {
@@ -54,36 +55,35 @@ public class Jugador {
                        .append(" de ")
                        .append(NombreCarta.values()[i])
                        .append("\n");
-                cartasContadas.addAll(mapaCartasPorNombre.get(NombreCarta.values()[i]));
+                cartasContadas.addAll(cartasPorNombre[i]);
             }
         }
 
-        // Agrupar cartas por pinta para detectar escaleras
-        Map<Pinta, List<Carta>> mapaEscaleras = new HashMap<>();
-        for (Carta c : cartas) {
-            mapaEscaleras
-                .computeIfAbsent(c.getPinta(), k -> new ArrayList<>())
-                .add(c);
+        ArrayList<Carta>[] cartasPorPinta = new ArrayList[4];
+        for (int i = 0; i < 4; i++) {
+            cartasPorPinta[i] = new ArrayList<>();
         }
 
-        for (Map.Entry<Pinta, List<Carta>> entry : mapaEscaleras.entrySet()) {
-            Pinta pinta = entry.getKey();
-            List<Carta> lista = entry.getValue();
+        for (Carta c : cartas) {
+            int indice = c.getPinta().ordinal(); // ordinal = 0, 1, 2, 3
+            cartasPorPinta[indice].add(c);
+        }
 
-            // Ordenar las cartas por valor
+        for (int i = 0; i < 4; i++) {
+            List<Carta> lista = cartasPorPinta[i];
             lista.sort(Comparator.comparingInt(c -> c.getNombre().ordinal()));
 
             List<Carta> secuencia = new ArrayList<>();
-            for (int i = 0; i < lista.size(); i++) {
-                if (secuencia.isEmpty() || lista.get(i).getNombre().ordinal() == secuencia.get(secuencia.size() - 1).getNombre().ordinal() + 1) {
-                    secuencia.add(lista.get(i));
+            for (int j = 0; j < lista.size(); j++) {
+                if (secuencia.isEmpty() || lista.get(j).getNombre().ordinal() == secuencia.get(secuencia.size() - 1).getNombre().ordinal() + 1) {
+                    secuencia.add(lista.get(j));
                 } else {
                     if (secuencia.size() >= 3) {
                         if (mensaje.length() == 0) mensaje.append("Se encontraron los siguientes grupos:\n");
                         mensaje.append("Escalera de ")
                                .append(secuencia.size())
                                .append(" cartas de ")
-                               .append(pinta)
+                               .append(Pinta.values()[i])
                                .append(": ")
                                .append(nombresDesdeCartas(secuencia))
                                .append("\n");
@@ -91,7 +91,7 @@ public class Jugador {
                         hayGrupos = true;
                     }
                     secuencia.clear();
-                    secuencia.add(lista.get(i));
+                    secuencia.add(lista.get(j));
                 }
             }
 
@@ -100,7 +100,7 @@ public class Jugador {
                 mensaje.append("Escalera de ")
                        .append(secuencia.size())
                        .append(" cartas de ")
-                       .append(pinta)
+                       .append(Pinta.values()[i])
                        .append(": ")
                        .append(nombresDesdeCartas(secuencia))
                        .append("\n");
@@ -109,7 +109,6 @@ public class Jugador {
             }
         }
 
-        // Calcular puntos solo con cartas que hacen parte de grupos/escaleras
         int puntos = 0;
         for (Carta c : cartasContadas) {
             puntos += c.getValor();
