@@ -11,9 +11,7 @@ public class Carta {
 
     private int indice;
 
-    // Constructor
     public Carta(Random r) {
-        // Generar un número entre 1 y 52
         indice = r.nextInt(52) + 1;
     }
 
@@ -54,7 +52,6 @@ public class Carta {
         return NombreCarta.values()[residuo - 1];
     }
 
-    // ✅ Nuevo método: Devuelve el valor numérico de la carta
     public int getValor() {
         NombreCarta nombre = getNombre();
         switch (nombre) {
